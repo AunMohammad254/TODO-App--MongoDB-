@@ -1,176 +1,122 @@
 {
-  "tech_stack": ["Node.js", "Express.js", "MongoDB", "Mongoose", "JWT", "bcryptjs", "Electron", "Jest", "Supertest"],
+  "tech_stack": [
+    "JavaScript",
+    "Node.js",
+    "Express.js",
+    "Electron",
+    "MongoDB",
+    "Mongoose",
+    "JWT",
+    "BCrypt",
+    "Jest",
+    "HTML5",
+    "CSS3",
+    "Font Awesome"
+  ],
   "features": [
     {
       "name": "User Authentication",
-      "description": "User registration and login functionality with JWT token-based authentication",
-      "files": ["src/controllers/authController.js", "src/routes/auth.js", "src/models/user.js", "src/middleware/auth.js"],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "paths": {
-          "/api/auth/register": {
-            "post": {
-              "summary": "Register a new user",
-              "requestBody": {
-                "required": true,
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "username": {"type": "string"},
-                        "email": {"type": "string"},
-                        "password": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "201": {"description": "User registered successfully"},
-                "400": {"description": "Validation error"}
-              }
-            }
-          },
-          "/api/auth/login": {
-            "post": {
-              "summary": "Login user",
-              "requestBody": {
-                "required": true,
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "username": {"type": "string"},
-                        "password": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Login successful"},
-                "401": {"description": "Invalid credentials"}
-              }
-            }
-          }
-        }
-      }
+      "description": "Complete user registration, login, and JWT-based authentication system with password encryption",
+      "files": [
+        "src/controllers/authController.js",
+        "src/routes/auth.js",
+        "src/models/user.js",
+        "src/middleware/auth.js"
+      ]
     },
     {
       "name": "Task Management",
-      "description": "CRUD operations for managing TODO tasks with filtering, pagination, and statistics",
-      "files": ["src/controllers/taskController.js", "src/routes/tasks.js", "src/models/task.js"],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "paths": {
-          "/api/tasks": {
-            "get": {
-              "summary": "Get user tasks with filtering and pagination",
-              "parameters": [
-                {"name": "status", "in": "query", "schema": {"type": "string"}},
-                {"name": "priority", "in": "query", "schema": {"type": "string"}},
-                {"name": "page", "in": "query", "schema": {"type": "integer"}},
-                {"name": "limit", "in": "query", "schema": {"type": "integer"}}
-              ],
-              "responses": {
-                "200": {"description": "Tasks retrieved successfully"}
-              }
-            },
-            "post": {
-              "summary": "Create a new task",
-              "requestBody": {
-                "required": true,
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "title": {"type": "string"},
-                        "description": {"type": "string"},
-                        "priority": {"type": "string", "enum": ["low", "medium", "high"]},
-                        "status": {"type": "string", "enum": ["Pending", "In Progress", "Completed"]},
-                        "dueDate": {"type": "string", "format": "date"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "201": {"description": "Task created successfully"},
-                "400": {"description": "Validation error"}
-              }
-            }
-          },
-          "/api/tasks/{id}": {
-            "put": {
-              "summary": "Update a task",
-              "parameters": [
-                {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
-              ],
-              "responses": {
-                "200": {"description": "Task updated successfully"},
-                "404": {"description": "Task not found"}
-              }
-            },
-            "delete": {
-              "summary": "Delete a task",
-              "parameters": [
-                {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
-              ],
-              "responses": {
-                "200": {"description": "Task deleted successfully"},
-                "404": {"description": "Task not found"}
-              }
-            }
-          },
-          "/api/tasks/stats": {
-            "get": {
-              "summary": "Get task statistics",
-              "responses": {
-                "200": {"description": "Statistics retrieved successfully"}
-              }
-            }
-          }
-        }
-      }
+      "description": "Full CRUD operations for tasks with priority levels, status tracking, and due date management",
+      "files": [
+        "src/controllers/taskController.js",
+        "src/routes/tasks.js",
+        "src/models/task.js"
+      ]
     },
     {
-      "name": "Database Connection",
-      "description": "MongoDB database connection and configuration management",
-      "files": ["src/utils/database.js", "config/config.js"],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Database Connection",
-          "description": "Internal database connection utility"
-        }
-      }
+      "name": "Database Connection and Initialization",
+      "description": "MongoDB Atlas connection, database initialization, indexing, and sample data creation",
+      "files": [
+        "src/utils/database.js",
+        "src/utils/initializeDatabase.js",
+        "config/config.js"
+      ]
     },
     {
       "name": "Security Middleware",
-      "description": "Authentication middleware, rate limiting, CORS, and security headers",
-      "files": ["src/middleware/auth.js", "src/middleware/errorHandler.js", "src/middleware/validation.js", "src/app.js"],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Security Middleware",
-          "description": "Security and validation middleware components"
-        }
-      }
+      "description": "Comprehensive security features including rate limiting, CORS, helmet, and input validation",
+      "files": [
+        "src/middleware/auth.js",
+        "src/middleware/validation.js",
+        "src/middleware/errorHandler.js",
+        "src/app.js"
+      ]
     },
     {
-      "name": "Frontend Interface",
-      "description": "Electron-based desktop application frontend with HTML, CSS, and JavaScript",
-      "files": ["main.js", "public/index.html", "public/css/style.css", "public/js/app.js"],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Frontend Interface",
-          "description": "Desktop application frontend interface"
-        }
-      }
+      "name": "Frontend User Interface",
+      "description": "Responsive web interface with login/register screens, task management dashboard, and real-time updates",
+      "files": [
+        "public/index.html",
+        "public/css/style.css",
+        "public/js/app.js"
+      ]
+    },
+    {
+      "name": "Electron Desktop Application",
+      "description": "Cross-platform desktop application wrapper with security configurations and window management",
+      "files": [
+        "main.js",
+        "package.json"
+      ]
+    },
+    {
+      "name": "Task Statistics and Analytics",
+      "description": "Comprehensive task statistics including completion rates, priority distribution, and status tracking",
+      "files": [
+        "src/controllers/taskController.js"
+      ]
+    },
+    {
+      "name": "Search and Filtering",
+      "description": "Advanced task search with full-text search capabilities and filtering by status, priority, and date",
+      "files": [
+        "src/controllers/taskController.js",
+        "src/models/task.js"
+      ]
+    },
+    {
+      "name": "Pagination and Sorting",
+      "description": "Efficient task pagination with customizable sorting options for large datasets",
+      "files": [
+        "src/controllers/taskController.js"
+      ]
+    },
+    {
+      "name": "Error Handling and Logging",
+      "description": "Global error handling, request logging, and application monitoring",
+      "files": [
+        "src/middleware/errorHandler.js",
+        "src/utils/logger.js",
+        "src/app.js"
+      ]
+    },
+    {
+      "name": "Testing Suite",
+      "description": "Comprehensive Jest test suite covering authentication, task management, and API endpoints",
+      "files": [
+        "tests/auth.test.js",
+        "tests/tasks.test.js",
+        "tests/setup.js",
+        "jest.config.js"
+      ]
+    },
+    {
+      "name": "Environment Configuration",
+      "description": "Flexible environment configuration for development, testing, and production environments",
+      "files": [
+        "config/config.js",
+        ".env"
+      ]
     }
   ]
 }

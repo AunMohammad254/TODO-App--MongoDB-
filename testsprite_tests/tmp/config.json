@@ -1,15 +1,15 @@
 {
   "status": "commited",
-  "type": "backend",
+  "type": "frontend",
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
-  "backendAuthType": "Bearer token",
-  "backendCredential": "321f607f5603f41e94b4b7b9dbd315cd67f512ec623a3ba0d5f4ae5ba143db4b",
+  "loginUser": "aunmohammad254@gmail.com",
+  "loginPassword": "A4EX3wTvWFibY@h",
   "executionArgs": {
     "projectName": "TODO App (MongoDB)",
     "projectPath": "d:\\Projects\\BackEnd Projects\\TODO App (MongoDB)",
     "testIds": [],
-    "additionalInstruction": "Conduct comprehensive testing of all API endpoints, authentication, task management, database operations, and security features. Focus on testing user registration/login, CRUD operations for tasks, filtering, pagination, and error handling scenarios.",
+    "additionalInstruction": "Perform comprehensive testing of the entire TODO application including authentication, task management, database operations, API endpoints, frontend functionality, and Electron desktop app features. Focus on identifying potential issues, validating system stability, and ensuring all components function as intended.",
     "envs": {
       "API_KEY": "sk-user-zpD0KtkBPDMpfsHzgGsH071WZsaocVgaq1CP2Ha7o3NMCEwb7M-YdNBnni8WQSDKPh08m_DP21YiPzXbgmmf3sVZQiwRVWg2UsDwl14xYjRdAeTjl4uPxOO5jT5hEgTsjdU"
     }

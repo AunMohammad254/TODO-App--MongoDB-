@@ -16,6 +16,8 @@ package-lock.json
 *.mongodb
 mongodb.log
 mongod.log
+# MongoDB Compass
+MONGODB_COMPASS_GUIDE.md
 
 # IDE/Editor
 .vscode/
@@ -44,3 +46,33 @@ build/
 todo_implementation_plan.md
 todo_implementation_plan.pdf
 Important.md
+# Confidential data
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+secrets/
+credentials/
+config/secrets/
+private/
+auth/
+tokens/
+api_keys/
+certificates/
+ssl/
+security/
+oauth/
+jwt/
+passwords.txt
+credentials.json
+secrets.yaml
+auth.config
+apikey.json
+token.json
+client_secret.json
+service-account.json
