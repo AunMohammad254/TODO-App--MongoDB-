@@ -2,7 +2,7 @@
   "name": "personal-todo-manager",
   "version": "1.0.0",
   "description": "Personal Desktop TODO Task Manager",
-  "author": "Aun's Task Manager",
+  "author": "Personal Task Manager Team",
   "main": "main.js",
   "scripts": {
     "start": "concurrently \"npm run server\" \"wait-on http://localhost:3000 && npm run electron\"",
