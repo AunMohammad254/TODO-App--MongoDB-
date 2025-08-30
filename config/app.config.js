@@ -5,7 +5,7 @@ require("dotenv").config({
 module.exports = {
   port: process.env.PORT || 3000,
   mongodb: {
-    uri: process.env.MONGO_URI || 'mongodb+srv://aunmohammad254_db_user:DZtAQGMkmnctzd1S@cluster0.xxothym.mongodb.net/todoapp?retryWrites=true&w=majority&authSource=admin',
+    uri: process.env.MONGO_URI,
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -24,7 +24,7 @@ module.exports = {
     }
   },
   jwt: {
-    secret: process.env.JWT_SECRET || '321f607f5603f41e94b4b7b9dbd315cd67f512ec623a3ba0d5f4ae5ba143db4b',
+    secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRATION || '7d',
   },
   bcrypt: {

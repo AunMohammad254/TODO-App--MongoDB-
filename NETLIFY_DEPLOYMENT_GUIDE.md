@@ -19,13 +19,44 @@ The "Base directory does not exist: /opt/build" error has been resolved by:
 - Base directory: `.` (project root)
 
 **Environment Variables (Required):**
+
+⚠️ **CRITICAL SECURITY NOTE**: Never commit these values to your repository!
+
 ```
+# Required for Production
 NODE_ENV=production
-MONGODB_URI=your_mongodb_connection_string
+MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
 NODE_VERSION=18
 NPM_VERSION=9
+
+# Optional Configuration
+JWT_EXPIRATION=7d
+BCRYPT_SALT_ROUNDS=12
+PORT=3000
 ```
+
+### Setting Environment Variables in Netlify
+
+1. **Access Netlify Dashboard**
+   - Go to your site dashboard
+   - Navigate to **Site settings** → **Build & deploy** → **Environment variables**
+
+2. **Add Required Variables**
+   - Click **"New variable"**
+   - Set each variable with **"Contains secret values"** checked for sensitive data
+
+3. **Recommended Security Settings** <mcreference link="https://ntl.fyi/configure-secrets-scanning" index="0">0</mcreference>
+   ```
+   SECRETS_SCAN_OMIT_KEYS=MONGO_URI,JWT_SECRET
+   ```
+
+### Environment Variable Security Policy
+
+- **Secret values are write-only** - Once set, you cannot view them again
+- **Explicit deploy contexts** - Set variables for specific environments
+- **Masked in logs** - Secret values are automatically masked in build logs
+- **Development context** - Use non-secret values for local development
 
 ### File Structure Verification
 

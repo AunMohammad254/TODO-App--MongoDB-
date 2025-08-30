@@ -19,12 +19,21 @@ let dbInitialized = false;
 const initDB = async () => {
   if (!dbInitialized) {
     try {
+      // Validate required environment variables
+      if (!process.env.MONGO_URI) {
+        throw new Error('MONGO_URI environment variable is required');
+      }
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is required');
+      }
+      
       await connectDatabase();
       await initializeDatabase();
       dbInitialized = true;
       console.log('Database initialized for serverless function');
     } catch (error) {
       console.error('Database initialization failed:', error.message);
+      throw error; // Re-throw to prevent function from continuing with invalid state
     }
   }
 };
@@ -64,8 +73,16 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize database before handling requests
 app.use(async (req, res, next) => {
-  await initDB();
-  next();
+  try {
+    await initDB();
+    next();
+  } catch (error) {
+    console.error('Failed to initialize database:', error.message);
+    res.status(500).json({ 
+      error: 'Database connection failed', 
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
 });
 
 // API routes
