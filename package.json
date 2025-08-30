@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "description": "Personal Desktop TODO Task Manager",
   "author": "Aun's Task Manager",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
     "start": "concurrently \"npm run server\" \"wait-on http://localhost:3000 && npm run electron\"",
-    "server": "cross-env NODE_ENV=development node src/server.js",
-    "dev": "concurrently \"nodemon src/server.js\" \"wait-on http://localhost:3000 && npm run electron-dev\"",
+    "server": "cross-env NODE_ENV=development node app/src/server.js",
+    "dev": "concurrently \"nodemon app/src/server.js\" \"wait-on http://localhost:3000 && npm run electron-dev\"",
     "electron": "electron .",
     "electron-dev": "ELECTRON_IS_DEV=1 electron .",
-    "build": "electron-builder",
+    "build": "npm install && echo 'Build completed for Netlify deployment'",
+    "build-electron": "electron-builder",
     "build-win": "electron-builder --win",
     "build-mac": "electron-builder --mac",
     "build-linux": "electron-builder --linux",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest --config=tests/jest.config.js",
+    "test:watch": "jest --config=tests/jest.config.js --watch"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -28,7 +29,8 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
@@ -46,12 +48,12 @@
     "appId": "com.personaltaskmanager.app",
     "productName": "Personal Task Manager",
     "directories": {
-      "output": "dist"
+      "output": "dist/electron"
     },
     "files": [
-      "main.js",
-      "src/**/*",
-      "public/**/*",
+      "app/main.js",
+      "app/src/**/*",
+      "app/public/**/*",
       "config/**/*"
     ],
     "extraResources": [
