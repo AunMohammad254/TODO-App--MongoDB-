@@ -45,6 +45,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      styleSrcElem: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:"],
       connectSrc: ["'self'", "https://cluster0.xxothym.mongodb.net"]
