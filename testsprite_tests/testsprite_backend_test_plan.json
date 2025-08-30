@@ -1,0 +1,213 @@
+{
+  "test_plan_id": "backend_comprehensive_test",
+  "project_name": "Personal TODO Task Manager",
+  "test_type": "backend",
+  "description": "Comprehensive backend testing for TODO application covering authentication, task management, database operations, and security",
+  "test_cases": [
+    {
+      "test_id": "auth_001",
+      "test_name": "User Registration Test",
+      "description": "Test user registration functionality with valid and invalid data",
+      "priority": "high",
+      "test_steps": [
+        "Send POST request to /api/auth/register with valid user data",
+        "Verify response status is 201",
+        "Verify JWT token is returned",
+        "Verify user data is stored in database",
+        "Test with invalid email format",
+        "Test with duplicate username",
+        "Test with missing required fields"
+      ],
+      "expected_results": [
+        "Successful registration returns 201 status",
+        "JWT token is generated",
+        "Invalid data returns 400 status",
+        "Duplicate username returns 400 status"
+      ]
+    },
+    {
+      "test_id": "auth_002",
+      "test_name": "User Login Test",
+      "description": "Test user login functionality with valid and invalid credentials",
+      "priority": "high",
+      "test_steps": [
+        "Send POST request to /api/auth/login with valid credentials",
+        "Verify response status is 200",
+        "Verify JWT token is returned",
+        "Test with invalid password",
+        "Test with non-existent username"
+      ],
+      "expected_results": [
+        "Valid login returns 200 status",
+        "JWT token is generated",
+        "Invalid credentials return 401 status"
+      ]
+    },
+    {
+      "test_id": "task_001",
+      "test_name": "Task Creation Test",
+      "description": "Test task creation with various data combinations",
+      "priority": "high",
+      "test_steps": [
+        "Authenticate user and get JWT token",
+        "Send POST request to /api/tasks with valid task data",
+        "Verify response status is 201",
+        "Verify task is created with correct user association",
+        "Test without authentication",
+        "Test with missing title",
+        "Test with invalid priority values"
+      ],
+      "expected_results": [
+        "Authenticated request creates task successfully",
+        "Unauthenticated request returns 401",
+        "Missing title returns 400",
+        "Task is associated with correct user"
+      ]
+    },
+    {
+      "test_id": "task_002",
+      "test_name": "Task Retrieval Test",
+      "description": "Test task retrieval with filtering and pagination",
+      "priority": "high",
+      "test_steps": [
+        "Create multiple test tasks with different statuses and priorities",
+        "Send GET request to /api/tasks",
+        "Verify all user tasks are returned",
+        "Test filtering by status",
+        "Test filtering by priority",
+        "Test pagination parameters"
+      ],
+      "expected_results": [
+        "All user tasks are retrieved",
+        "Filtering works correctly",
+        "Pagination returns correct results",
+        "Only user's own tasks are returned"
+      ]
+    },
+    {
+      "test_id": "task_003",
+      "test_name": "Task Update Test",
+      "description": "Test task update functionality and authorization",
+      "priority": "high",
+      "test_steps": [
+        "Create a test task",
+        "Send PUT request to /api/tasks/:id with updated data",
+        "Verify task is updated correctly",
+        "Test updating task of another user",
+        "Test with invalid task ID"
+      ],
+      "expected_results": [
+        "Task updates successfully for owner",
+        "Cannot update another user's task",
+        "Invalid ID returns 404"
+      ]
+    },
+    {
+      "test_id": "task_004",
+      "test_name": "Task Deletion Test",
+      "description": "Test task deletion functionality and authorization",
+      "priority": "high",
+      "test_steps": [
+        "Create a test task",
+        "Send DELETE request to /api/tasks/:id",
+        "Verify task is deleted from database",
+        "Test deleting non-existent task",
+        "Test deleting another user's task"
+      ],
+      "expected_results": [
+        "Task deletes successfully for owner",
+        "Task is removed from database",
+        "Cannot delete another user's task",
+        "Non-existent task returns 404"
+      ]
+    },
+    {
+      "test_id": "task_005",
+      "test_name": "Task Statistics Test",
+      "description": "Test task statistics endpoint",
+      "priority": "medium",
+      "test_steps": [
+        "Create tasks with different statuses",
+        "Send GET request to /api/tasks/stats",
+        "Verify statistics are calculated correctly",
+        "Test without authentication"
+      ],
+      "expected_results": [
+        "Statistics show correct counts",
+        "Status breakdown is accurate",
+        "Unauthenticated request returns 401"
+      ]
+    },
+    {
+      "test_id": "security_001",
+      "test_name": "Authentication Middleware Test",
+      "description": "Test JWT authentication middleware",
+      "priority": "high",
+      "test_steps": [
+        "Send requests to protected endpoints without token",
+        "Send requests with invalid token",
+        "Send requests with expired token",
+        "Send requests with valid token"
+      ],
+      "expected_results": [
+        "No token returns 401",
+        "Invalid token returns 401",
+        "Expired token returns 401",
+        "Valid token allows access"
+      ]
+    },
+    {
+      "test_id": "database_001",
+      "test_name": "Database Connection Test",
+      "description": "Test database connectivity and operations",
+      "priority": "high",
+      "test_steps": [
+        "Verify database connection is established",
+        "Test CRUD operations on User model",
+        "Test CRUD operations on Task model",
+        "Test data validation constraints"
+      ],
+      "expected_results": [
+        "Database connects successfully",
+        "Models perform CRUD operations correctly",
+        "Validation constraints are enforced"
+      ]
+    },
+    {
+      "test_id": "validation_001",
+      "test_name": "Input Validation Test",
+      "description": "Test input validation and sanitization",
+      "priority": "medium",
+      "test_steps": [
+        "Test email format validation",
+        "Test password strength requirements",
+        "Test task title length limits",
+        "Test enum value validation for priority and status"
+      ],
+      "expected_results": [
+        "Invalid email formats are rejected",
+        "Weak passwords are rejected",
+        "Field length limits are enforced",
+        "Invalid enum values are rejected"
+      ]
+    }
+  ],
+  "test_environment": {
+    "base_url": "http://localhost:3000",
+    "database": "MongoDB (test environment)",
+    "authentication": "JWT tokens"
+  },
+  "test_data": {
+    "valid_user": {
+      "username": "testuser",
+      "email": "test@example.com",
+      "password": "password123"
+    },
+    "valid_task": {
+      "title": "Test Task",
+      "description": "Test Description",
+      "priority": "high",
+      "status": "Pending"
+    }
+  }
+}
