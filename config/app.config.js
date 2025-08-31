@@ -1,6 +1,6 @@
 try {
   require("dotenv").config({
-    path: "./.env",
+    path: "../../.env",
   });
 } catch (e) {
   // dotenv is optional in environments where env vars are injected
