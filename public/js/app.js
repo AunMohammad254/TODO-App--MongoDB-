@@ -26,7 +26,7 @@ class TaskManager {
             return 'http://localhost:3000';
         } else {
             // In development or web browser, use relative URLs
-            return '';
+            return 'http://localhost:3000';
         }
     }
 

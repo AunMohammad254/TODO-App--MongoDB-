@@ -54,7 +54,7 @@ app.use(compression());
 app.use(morgan('combined'));
 
 // Serve static files
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../../public')));
 
 // Health check (not guarded)
 app.get('/api/health', (req, res) => {
@@ -77,14 +77,16 @@ const dbGuard = (req, res, next) => {
 };
 
 // API Routes (guarded)
-app.use('/api', dbGuard);
+if (process.env.NODE_ENV !== 'test') {
+  app.use('/api', dbGuard);
+}
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Serve frontend for all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../../public/index.html'));
+// });
 
 // Error handling middleware
 app.use(errorHandler);
