@@ -1,0 +1,5 @@
+# API routes - redirect to serverless functions
+/api/*  /.netlify/functions/api  200
+
+# SPA fallback - all other routes should serve index.html
+/*    /index.html   200
