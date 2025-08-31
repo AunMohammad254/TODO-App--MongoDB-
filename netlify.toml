@@ -1,6 +1,7 @@
+# Main build configuration
 [build]
   # Build command for the application
-  command = "node deployment/scripts/build-netlify.js && npm run build"
+  command = "node deployment/scripts/build-netlify.js && npm run build:production"
   
   # Directory to publish (where the built files are located)
   publish = "app/public"
@@ -8,37 +9,24 @@
   # Base directory for the build
   base = "."
   
+  # Functions directory
+  functions = "deployment/netlify/functions"
+  
+  # Edge functions directory
+  edge_functions = "deployment/netlify/edge-functions"
+  
+  # Ignore build command if conditions are met
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!README.md' ':!docs/'"
+
   # Environment variables for build
   [build.environment]
     NODE_VERSION = "18"
     NPM_VERSION = "9"
     NODE_ENV = "production"
-
-# Redirect rules for SPA routing
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Headers for security
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://cluster0.xxothym.mongodb.net;"
-
-# Function configuration for serverless functions
-[functions]
-  directory = "deployment/netlify/functions"
-  node_bundler = "esbuild"
+    GENERATE_SOURCEMAP = "false"
+    CI = "true"
+    BUILD_FLAGS = "--optimize --minify"
+    PACKAGE_MANAGER = "npm"
 
 # Development settings
 [dev]
@@ -46,3 +34,741 @@
   port = 3000
   publish = "app/public"
   autoLaunch = false
+  framework = "#auto"
+  targetPort = 8888
+
+# Context-specific build configurations
+[context.production]
+  publish = "dist"
+  command = "npm run build:prod && npm run optimize"
+  [context.production.environment]
+    NODE_ENV = "production"
+    REACT_APP_ENV = "production"
+    REACT_APP_API_URL = "https://api.myapp.com"
+    REACT_APP_CDN_URL = "https://cdn.myapp.com"
+
+[context.staging]
+  publish = "dist"
+  command = "npm run build:staging"
+  [context.staging.environment]
+    NODE_ENV = "staging"
+    REACT_APP_ENV = "staging"
+    REACT_APP_API_URL = "https://staging-api.myapp.com"
+    REACT_APP_DEBUG = "true"
+
+[context.develop]
+  publish = "dist"
+  command = "npm run build:dev"
+  [context.develop.environment]
+    NODE_ENV = "development"
+    REACT_APP_ENV = "development"
+    REACT_APP_API_URL = "https://dev-api.myapp.com"
+    REACT_APP_DEBUG = "true"
+
+[context.deploy-preview]
+  publish = "dist"
+  command = "npm run build:preview"
+  [context.deploy-preview.environment]
+    NODE_ENV = "preview"
+    REACT_APP_ENV = "preview"
+
+[context.branch-deploy]
+  command = "npm run build:branch"
+  [context.branch-deploy.environment]
+    NODE_ENV = "development"
+
+# Plugin configurations
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[plugins]]
+  package = "netlify-plugin-cypress"
+  [plugins.inputs]
+    enable = true
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  [plugins.inputs]
+    thresholds.performance = 0.8
+    thresholds.accessibility = 0.9
+    thresholds.best-practices = 0.9
+    thresholds.seo = 0.8
+
+[[plugins]]
+  package = "netlify-plugin-submit-sitemap"
+  [plugins.inputs]
+    baseUrl = "https://myapp.com"
+    sitemapPath = "/sitemap.xml"
+    providers = [
+      "google",
+      "bing",
+      "yandex"
+    ]
+
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+[[plugins]]
+  package = "netlify-plugin-checklinks"
+  [plugins.inputs]
+    entryPoints = [
+      "*.html"
+    ]
+    recursive = true
+    pretty = true
+    skipPatterns = [
+      "tel:*",
+      "mailto:*"
+    ]
+
+# Redirect rules for SPA routing and legacy URLs
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/auth/*"
+  to = "/.netlify/functions/auth/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/webhook/*"
+  to = "/.netlify/functions/webhook/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/upload/*"
+  to = "/.netlify/functions/upload/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/graphql"
+  to = "/.netlify/functions/graphql"
+  status = 200
+
+# Legacy redirects
+[[redirects]]
+  from = "/old-blog/*"
+  to = "/blog/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/products/:id"
+  to = "/items/:id"
+  status = 301
+
+[[redirects]]
+  from = "/user/:username"
+  to = "/profile/:username"
+  status = 302
+
+[[redirects]]
+  from = "/admin"
+  to = "/dashboard"
+  status = 301
+
+# External redirects
+[[redirects]]
+  from = "/docs/*"
+  to = "https://docs.myapp.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/support"
+  to = "https://support.myapp.com"
+  status = 302
+
+# Conditional redirects
+[[redirects]]
+  from = "/mobile/*"
+  to = "/app/:splat"
+  status = 302
+  conditions = {Role = ["mobile"]}
+
+[[redirects]]
+  from = "/beta/*"
+  to = "/beta-app/:splat"
+  status = 200
+  conditions = {Role = ["beta-tester"]}
+
+# Geographic redirects
+[[redirects]]
+  from = "/eu/*"
+  to = "https://eu.myapp.com/:splat"
+  status = 302
+  conditions = {Country = ["DE", "FR", "IT", "ES", "NL", "GB"]}
+
+[[redirects]]
+  from = "/asia/*"
+  to = "https://asia.myapp.com/:splat"
+  status = 302
+  conditions = {Country = ["JP", "KR", "CN", "IN", "SG"]}
+
+# Query parameter handling
+[[redirects]]
+  from = "/search"
+  to = "/search?q=:q"
+  status = 200
+  query = {q = ":q"}
+
+# SPA fallback (must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = '''
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://www.google-analytics.com https://www.googletagmanager.com;
+      style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://unpkg.com;
+      style-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+      font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:;
+      img-src 'self' data: blob: https: http:;
+      media-src 'self' data: blob: https:;
+      connect-src 'self' https://api.myapp.com https://analytics.google.com https://www.google-analytics.com wss: ws:;
+      frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'self';
+      manifest-src 'self';
+      worker-src 'self' blob:;
+    '''
+    Permissions-Policy = '''
+      accelerometer=(),
+      autoplay=(self),
+      camera=(),
+      clipboard-read=(self),
+      clipboard-write=(self),
+      fullscreen=(self),
+      geolocation=(),
+      gyroscope=(),
+      magnetometer=(),
+      microphone=(),
+      midi=(),
+      payment=(),
+      picture-in-picture=(self),
+      sync-xhr=(),
+      usb=()
+    '''
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+# API specific headers
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    Access-Control-Allow-Headers = "X-Requested-With, Content-Type, Authorization, Accept, Origin, User-Agent"
+    Access-Control-Max-Age = "86400"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Static assets caching
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Vary = "Accept-Encoding"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "text/css; charset=utf-8"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "application/javascript; charset=utf-8"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff2"
+    Access-Control-Allow-Origin = "*"
+
+# Images optimization headers
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Vary = "Accept"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Vary = "Accept"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Vary = "Accept"
+
+# Function configuration for serverless functions
+[functions]
+  directory = "deployment/netlify/functions"
+  node_bundler = "esbuild"
+  external_node_modules = ["sharp", "canvas", "puppeteer"]
+  included_files = ["data/**", "config/**", "assets/**"]
+
+# Edge Functions configuration
+[edge_functions]
+  directory = "deployment/netlify/edge-functions"
+
+[[edge_functions]]
+  function = "auth-check"
+  path = "/dashboard/*"
+
+[[edge_functions]]
+  function = "geolocation"
+  path = "/api/location"
+
+[[edge_functions]]
+  function = "ab-test"
+  path = "/landing/*"
+
+[[edge_functions]]
+  function = "rate-limit"
+  path = "/api/*"
+
+# Branch-specific configurations
+[context.feature-branch]
+  command = "npm run build:feature"
+  [context.feature-branch.environment]
+    NODE_ENV = "development"
+    REACT_APP_FEATURE_FLAGS = "true"
+
+[context.hotfix]
+  command = "npm run build:hotfix"
+  [context.hotfix.environment]
+    NODE_ENV = "production"
+    REACT_APP_HOTFIX_MODE = "true"
+
+# Split testing
+[[plugins]]
+  package = "@netlify/plugin-split-testing"
+  [plugins.inputs]
+    branches = ["main", "experiment"]
+
+# Form handling
+[forms]
+  [forms.contact]
+    name = "Contact Form"
+    action = "/api/contact"
+    method = "POST"
+    
+  [forms.newsletter]
+    name = "Newsletter Signup"
+    action = "/api/newsletter"
+    method = "POST"
+
+# Large Media configuration for Git LFS
+[lfs]
+  GitLFS = true
+
+# Processing configuration
+[processing]
+  skip_processing = false
+  [processing.css]
+    bundle = true
+    minify = true
+  [processing.js]
+    bundle = true
+    minify = true
+  [processing.html]
+    pretty_urls = true
+  [processing.images]
+    compress = true
+
+# Template configuration
+[template.environment]
+  HUGO_VERSION = "0.82.0"
+  RUBY_VERSION = "2.7.2"
+  YARN_VERSION = "1.22.4"
+  PHP_VERSION = "8.0"
+  GO_VERSION = "1.16"
+  PYTHON_VERSION = "3.8"
+
+# Identity and authentication
+[identity]
+  url = "https://myapp.com/.netlify/identity"
+
+# Functions runtime settings
+[functions."api-*"]
+  node_bundler = "esbuild"
+  external_node_modules = ["puppeteer", "chrome-aws-lambda"]
+
+[functions."upload-*"]
+  timeout = 60
+  memory = 1024
+
+[functions."auth-*"]
+  timeout = 10
+  memory = 256
+
+[functions."webhook-*"]
+  timeout = 30
+  memory = 512
+
+# Build plugins for different environments
+[[context.production.plugins]]
+  package = "@netlify/plugin-lighthouse"
+  [plugins.inputs]
+    thresholds.performance = 0.9
+    thresholds.accessibility = 0.95
+    thresholds.best-practices = 0.9
+    thresholds.seo = 0.9
+
+[[context.staging.plugins]]
+  package = "netlify-plugin-cypress"
+  [plugins.inputs]
+    enable = true
+    record = true
+    parallel = true
+
+# Advanced redirect examples
+[[redirects]]
+  from = "/shop/:category/:subcategory/:product"
+  to = "/products/:product?category=:category&subcategory=:subcategory"
+  status = 301
+
+[[redirects]]
+  from = "/api/v1/*"
+  to = "/api/v2/:splat"
+  status = 301
+  headers = {X-API-Version = "v2"}
+
+[[redirects]]
+  from = "/download/:file"
+  to = "https://cdn.myapp.com/downloads/:file"
+  status = 302
+  conditions = {Role = ["premium", "admin"]}
+
+[[redirects]]
+  from = "/maintenance"
+  to = "/maintenance.html"
+  status = 503
+  force = true
+  conditions = {Role = ["!admin"]}
+
+# Language-based redirects
+[[redirects]]
+  from = "/*"
+  to = "/es/:splat"
+  status = 302
+  conditions = {Language = ["es"], Country = ["ES", "MX", "AR", "CO"]}
+
+[[redirects]]
+  from = "/*"
+  to = "/fr/:splat"
+  status = 302
+  conditions = {Language = ["fr"], Country = ["FR", "CA", "BE"]}
+
+# A/B testing redirects
+[[redirects]]
+  from = "/landing"
+  to = "/landing-v1"
+  status = 200
+  conditions = {Role = ["control-group"]}
+
+[[redirects]]
+  from = "/landing"
+  to = "/landing-v2"
+  status = 200
+  conditions = {Role = ["test-group"]}
+
+# Device-based redirects
+[[redirects]]
+  from = "/app"
+  to = "/mobile-app"
+  status = 302
+  conditions = {Role = ["mobile"]}
+
+# Environment-specific headers
+[[headers]]
+  for = "/api/production/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+    X-Environment = "production"
+
+[[headers]]
+  for = "/api/staging/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    X-Environment = "staging"
+    X-Debug-Mode = "true"
+
+# CORS for different endpoints
+[[headers]]
+  for = "/api/public/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+
+[[headers]]
+  for = "/api/restricted/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://myapp.com"
+    Access-Control-Allow-Credentials = "true"
+
+# GraphQL specific headers
+[[headers]]
+  for = "/graphql"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Apollo-Tracing"
+
+# WebSocket headers
+[[headers]]
+  for = "/ws/*"
+  [headers.values]
+    Upgrade = "websocket"
+    Connection = "Upgrade"
+
+# Progressive Web App headers
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "no-cache"
+
+# Security headers for sensitive areas
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/dashboard/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    Cache-Control = "private, no-cache"
+
+# File-specific headers
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    Content-Type = "application/pdf"
+    Content-Disposition = "inline"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.zip"
+  [headers.values]
+    Content-Type = "application/zip"
+    Content-Disposition = "attachment"
+
+# Custom headers for third-party integrations
+[[headers]]
+  for = "/stripe-webhook"
+  [headers.values]
+    X-Webhook-Source = "stripe"
+
+[[headers]]
+  for = "/github-webhook"
+  [headers.values]
+    X-Webhook-Source = "github"
+
+# Performance headers
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Link = "</assets/critical.css>; rel=preload; as=style, </assets/app.js>; rel=preload; as=script"
+
+[[headers]]
+  for = "/landing"
+  [headers.values]
+    Link = "</hero-image.webp>; rel=preload; as=image"
+
+# Rate limiting and abuse prevention
+[[headers]]
+  for = "/api/auth/login"
+  [headers.values]
+    X-Rate-Limit = "5 per minute"
+
+[[headers]]
+  for = "/api/auth/register"
+  [headers.values]
+    X-Rate-Limit = "3 per hour"
+
+# Error page redirects
+[[redirects]]
+  from = "/404"
+  to = "/error/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/500"
+  to = "/error/500.html"
+  status = 500
+
+# Maintenance mode
+[[redirects]]
+  from = "/*"
+  to = "/maintenance.html"
+  status = 503
+  conditions = {Role = ["maintenance"]}
+  force = true
+
+# Analytics and tracking
+[[headers]]
+  for = "/analytics/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+    Cache-Control = "private, no-cache"
+
+# Cookie headers
+[[headers]]
+  for = "/api/auth/*"
+  [headers.values]
+    Set-Cookie = "SameSite=Strict; Secure; HttpOnly"
+
+# Environment-specific functions configuration
+[context.production.functions]
+  "*" = {timeout = 30, memory = 1024}
+
+[context.staging.functions]
+  "*" = {timeout = 60, memory = 512}
+
+[context.development.functions]
+  "*" = {timeout = 900, memory = 256}
+
+# Build processing optimization
+[build.processing]
+  [build.processing.css]
+    bundle = true
+    minify = true
+  [build.processing.js]
+    bundle = true
+    minify = true
+  [build.processing.html]
+    pretty_urls = true
+  [build.processing.images]
+    compress = true
+
+# Environment variables per context
+[context.production.environment]
+  DATABASE_URL = "postgresql://prod-db-url"
+  REDIS_URL = "redis://prod-redis-url"
+  JWT_SECRET = "prod-jwt-secret"
+  STRIPE_PUBLISHABLE_KEY = "pk_live_..."
+  GOOGLE_ANALYTICS_ID = "G-XXXXXXXXXX"
+  SENTRY_DSN = "https://prod-sentry-dsn"
+  LOG_LEVEL = "warn"
+  RATE_LIMIT_MAX = "1000"
+
+[context.staging.environment]
+  DATABASE_URL = "postgresql://staging-db-url"
+  REDIS_URL = "redis://staging-redis-url"
+  JWT_SECRET = "staging-jwt-secret"
+  STRIPE_PUBLISHABLE_KEY = "pk_test_..."
+  GOOGLE_ANALYTICS_ID = "G-YYYYYYYYYY"
+  SENTRY_DSN = "https://staging-sentry-dsn"
+  LOG_LEVEL = "debug"
+  RATE_LIMIT_MAX = "100"
+
+[context.develop.environment]
+  DATABASE_URL = "postgresql://dev-db-url"
+  REDIS_URL = "redis://dev-redis-url"
+  JWT_SECRET = "dev-jwt-secret"
+  LOG_LEVEL = "debug"
+  RATE_LIMIT_MAX = "10"
+  DEBUG_MODE = "true"
+
+# Advanced plugin configurations
+[[plugins]]
+  package = "netlify-plugin-inline-critical-css"
+  [plugins.inputs]
+    src = "dist"
+
+[[plugins]]
+  package = "netlify-plugin-minify-html"
+  [plugins.inputs]
+    contexts = ["production", "deploy-preview"]
+
+[[plugins]]
+  package = "netlify-plugin-image-optim"
+
+[[plugins]]
+  package = "netlify-plugin-a11y"
+  [plugins.inputs]
+    checkPaths = ["/", "/about", "/contact"]
+
+[[plugins]]
+  package = "netlify-plugin-no-more-404"
+  [plugins.inputs]
+    redirectTo = "/404"
+    exclude = ["/api/*", "/admin/*"]
+
+# Forms with advanced configuration
+[[forms]]
+  name = "contact"
+  [forms.settings]
+    success_url = "/thank-you"
+    error_url = "/error"
+    spam_protection = true
+
+[[forms]]
+  name = "newsletter"
+  [forms.settings]
+    success_url = "/"
+    spam_protection = true
+    notification_email = "admin@myapp.com"
+
+# Split testing configurations
+[[split_tests]]
+  path = "/landing"
+  branches = ["main", "variant-a", "variant-b"]
+  
+[[split_tests]]
+  path = "/pricing"
+  branches = ["original", "new-pricing"]
+
+# Custom build hooks
+[build.command_hooks]
+  before_build = "npm run prebuild && npm run test:unit"
+  after_build = "npm run postbuild && npm run test:e2e"
+
+# Custom ignore patterns
+[build.ignore]
+  command = '''
+    if [ "$CONTEXT" = "production" ]; then
+      git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- app/ api/ && exit 1 || exit 0
+    else
+      exit 0
+    fi
+  '''
+
+# Site metadata
+[site]
+  id = "unique-site-id-12345"
+  name = "My Full Stack Application"
+  url = "https://myapp.com"

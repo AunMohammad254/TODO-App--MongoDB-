@@ -1,8 +1,31 @@
 {
   "version": 2,
+  "name": "my-fullstack-app",
+  "alias": ["my-app.vercel.app", "my-custom-domain.com"],
+  
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/**/*.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "package.json",
       "use": "@vercel/node"
     },
     {
@@ -10,35 +33,314 @@
       "use": "@vercel/static"
     },
     {
-      "src": "public/index.html",
+      "src": "dist/**",
       "use": "@vercel/static"
     },
     {
-      "src": "public/assets/**",
+      "src": "build/**",
       "use": "@vercel/static"
     }
   ],
+
   "routes": [
+    {
+      "src": "/health",
+      "dest": "/api/health"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "/api/auth/index.js"
+    },
+    {
+      "src": "/api/users/(.*)",
+      "dest": "/api/users/index.js"
+    },
+    {
+      "src": "/api/products/(.*)",
+      "dest": "/api/products/index.js"
+    },
+    {
+      "src": "/api/webhook/(.*)",
+      "dest": "/api/webhook/index.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
     {
-      "src": "/(.*\\.(css|js|ico|svg|png|jpg|jpeg|gif|woff|woff2|ttf|eot))",
-      "dest": "/public/$1"
+      "src": "/admin/(.*)",
+      "dest": "/admin/index.html",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "/dashboard/(.*)",
+      "dest": "/dashboard/index.html"
+    },
+    {
+      "src": "/(.*\\.(css|js|ico|svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot|otf|map|json|xml|txt))",
+      "dest": "/public/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/public/static/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000"
+      }
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/api/uploads/$1"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/api/sitemap"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
     },
     {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
   ],
+
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Authorization"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+
+  "redirects": [
+    {
+      "source": "/old-page",
+      "destination": "/new-page",
+      "permanent": true
+    },
+    {
+      "source": "/blog/:slug*",
+      "destination": "/posts/:slug*",
+      "permanent": false
+    },
+    {
+      "source": "/products/:id",
+      "destination": "/items/:id",
+      "statusCode": 301
+    },
+    {
+      "source": "/legacy/(.*)",
+      "destination": "/modern/$1",
+      "statusCode": 308
+    }
+  ],
+
+  "rewrites": [
+    {
+      "source": "/graphql",
+      "destination": "/api/graphql"
+    },
+    {
+      "source": "/docs/(.*)",
+      "destination": "https://docs.example.com/$1"
+    },
+    {
+      "source": "/blog/(.*)",
+      "destination": "https://blog.example.com/$1"
+    }
+  ],
+
+  "cleanUrls": true,
+  "trailingSlash": false,
+
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret",
+    "STRIPE_SECRET_KEY": "@stripe_secret",
+    "SENDGRID_API_KEY": "@sendgrid_key",
+    "REDIS_URL": "@redis_url",
+    "AWS_ACCESS_KEY_ID": "@aws_access_key",
+    "AWS_SECRET_ACCESS_KEY": "@aws_secret_key",
+    "S3_BUCKET_NAME": "@s3_bucket",
+    "MONGODB_URI": "@mongodb_uri",
+    "GOOGLE_CLIENT_ID": "@google_client_id",
+    "GOOGLE_CLIENT_SECRET": "@google_client_secret",
+    "FACEBOOK_APP_ID": "@facebook_app_id",
+    "FACEBOOK_APP_SECRET": "@facebook_app_secret",
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "WEBHOOK_SECRET": "@webhook_secret",
+    "API_BASE_URL": "https://api.example.com",
+    "CDN_URL": "https://cdn.example.com",
+    "ANALYTICS_ID": "@analytics_id",
+    "SENTRY_DSN": "@sentry_dsn",
+    "PUSHER_APP_ID": "@pusher_app_id",
+    "PUSHER_KEY": "@pusher_key",
+    "PUSHER_SECRET": "@pusher_secret",
+    "PUSHER_CLUSTER": "us2",
+    "MAILGUN_API_KEY": "@mailgun_key",
+    "MAILGUN_DOMAIN": "@mailgun_domain",
+    "CLOUDINARY_CLOUD_NAME": "@cloudinary_name",
+    "CLOUDINARY_API_KEY": "@cloudinary_key",
+    "CLOUDINARY_API_SECRET": "@cloudinary_secret",
+    "OPENAI_API_KEY": "@openai_key",
+    "ANTHROPIC_API_KEY": "@anthropic_key"
   },
+
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "GENERATE_SOURCEMAP": "false",
+      "CI": "true"
+    }
+  },
+
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "memory": 1024
+      "memory": 1024,
+      "runtime": "nodejs18.x"
+    },
+    "api/auth/**/*.js": {
+      "maxDuration": 10,
+      "memory": 512,
+      "runtime": "nodejs18.x"
+    },
+    "api/users/**/*.js": {
+      "maxDuration": 15,
+      "memory": 512,
+      "runtime": "nodejs18.x"
+    },
+    "api/webhook/**/*.js": {
+      "maxDuration": 25,
+      "memory": 256,
+      "runtime": "nodejs18.x"
+    },
+    "api/upload/**/*.js": {
+      "maxDuration": 60,
+      "memory": 3008,
+      "runtime": "nodejs18.x"
+    },
+    "api/ml/**/*.py": {
+      "maxDuration": 60,
+      "memory": 3008,
+      "runtime": "python3.9"
+    },
+    "api/analytics/**/*.js": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "nodejs18.x"
     }
-  }
+  },
+
+  "regions": ["iad1", "sfo1", "fra1"],
+  
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/daily-report",
+      "schedule": "0 9 * * MON-FRI"
+    },
+    {
+      "path": "/api/cron/weekly-backup",
+      "schedule": "0 2 * * SUN"
+    },
+    {
+      "path": "/api/cron/monthly-analytics",
+      "schedule": "0 1 1 * *"
+    }
+  ],
+
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "outputDirectory": "dist",
+
+  "framework": "nextjs",
+  "nodeVersion": "18.x",
+
+  "github": {
+    "silent": true,
+    "autoAlias": false
+  },
+
+  "public": false,
+
+  "scope": "my-team",
+
+  "regions": ["iad1"],
+
+  "buildCommand": "npm run build:production",
+  
+  "installCommand": "npm install --production=false",
+
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"production\" ]; then exit 1; else exit 0; fi"
 }
