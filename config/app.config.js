@@ -1,11 +1,18 @@
-require("dotenv").config({
-  path: "./.env",
-});
+try {
+  require("dotenv").config({
+    path: "./.env",
+  });
+} catch (e) {
+  // dotenv is optional in environments where env vars are injected
+  if (process.env.NODE_ENV !== 'test') {
+    console.warn('Warning: dotenv not found; relying on existing environment variables');
+  }
+}
 
 module.exports = {
   port: process.env.PORT || 3000,
   mongodb: {
-    uri: process.env.MONGO_URI,
+    uri: process.env.MONGO_URI || process.env.MONGODB_URI || process.env.ATLAS_URI,
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -16,8 +23,8 @@ module.exports = {
       retryWrites: true,
       w: 'majority',
       authSource: 'admin',
-      tls: true,
-      tlsAllowInvalidCertificates: false,
+      tls: process.env.DB_TLS ? process.env.DB_TLS === 'true' : true,
+      tlsAllowInvalidCertificates: process.env.DB_TLS_ALLOW_INVALID_CERTS === 'true',
       heartbeatFrequencyMS: 10000, // How often to check the server status
       maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
       connectTimeoutMS: 10000 // Give up initial connection after 10 seconds

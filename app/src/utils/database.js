@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const config = require('../../../config/app.config');
 
+let isConnected = false;
+
 const connectDatabase = async () => {
   try {
     // Validate connection string exists
@@ -10,6 +12,7 @@ const connectDatabase = async () => {
 
     // Set up connection event listeners
     mongoose.connection.on('connected', () => {
+      isConnected = true;
       console.log('✅ MongoDB Atlas connected successfully');
     });
 
@@ -18,22 +21,28 @@ const connectDatabase = async () => {
     });
 
     mongoose.connection.on('disconnected', () => {
+      isConnected = false;
       console.log('⚠️  MongoDB disconnected');
     });
 
     mongoose.connection.on('reconnected', () => {
+      isConnected = true;
       console.log('🔄 MongoDB reconnected');
     });
 
-    // Handle application termination
+    // Handle application termination (avoid exiting in serverless environments)
     process.on('SIGINT', async () => {
       try {
         await mongoose.connection.close();
         console.log('MongoDB connection closed through app termination');
-        process.exit(0);
+        if (!process.env.VERCEL) {
+          process.exit(0);
+        }
       } catch (error) {
         console.error('Error closing MongoDB connection:', error.message);
-        process.exit(1);
+        if (!process.env.VERCEL) {
+          process.exit(1);
+        }
       }
     });
 
@@ -60,11 +69,15 @@ const connectDatabase = async () => {
       console.error('💡 Authentication failed - check username/password');
     }
     
-    if (process.env.NODE_ENV !== 'test') {
+    // In serverless environments (e.g., Vercel), do not exit the process; rethrow instead
+    if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
       process.exit(1);
     }
     throw error;
   }
 };
+
+// Expose connection status for health checks and middleware
+connectDatabase.getStatus = () => ({ isConnected });
 
 module.exports = connectDatabase;

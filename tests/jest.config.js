@@ -7,5 +7,6 @@ module.exports = {
     '!app/src/server.js',
     '!**/node_modules/**'
   ],
-  testTimeout: 30000
+  testTimeout: 30000,
+  setupFiles: ['<rootDir>/test-env.js']
 };

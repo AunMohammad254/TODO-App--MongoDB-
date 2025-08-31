@@ -1,6 +1,16 @@
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
 
+  // Explicit config errors
+  if (err.message && (
+    err.message.includes('JWT secret is not configured') ||
+    err.message.includes('MongoDB connection string is not provided')
+  )) {
+    return res.status(err.status || 500).json({
+      error: 'Server configuration error. Please contact the administrator.'
+    });
+  }
+
   // Mongoose validation error
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(val => val.message);

@@ -56,7 +56,28 @@ app.use(morgan('combined'));
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));
 
-// API Routes
+// Health check (not guarded)
+app.get('/api/health', (req, res) => {
+  const status = typeof connectDatabase.getStatus === 'function' ? connectDatabase.getStatus() : { isConnected: false };
+  res.json({ status: 'ok', db: status.isConnected ? 'connected' : 'disconnected', env: process.env.NODE_ENV || 'development' });
+});
+
+// Database connectivity guard for API routes
+const dbGuard = (req, res, next) => {
+  // Skip database check in test environment
+  if (process.env.NODE_ENV === 'test') {
+    return next();
+  }
+  
+  const status = typeof connectDatabase.getStatus === 'function' ? connectDatabase.getStatus() : { isConnected: false };
+  if (!status.isConnected) {
+    return res.status(503).json({ message: 'Service temporarily unavailable: database not connected' });
+  }
+  next();
+};
+
+// API Routes (guarded)
+app.use('/api', dbGuard);
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 

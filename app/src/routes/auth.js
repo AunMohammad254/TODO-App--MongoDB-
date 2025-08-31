@@ -26,8 +26,8 @@ const loginValidation = [
 ];
 
 // Routes
-router.post('/register', registerValidation, register);
-router.post('/login', loginValidation, login);
-router.get('/profile', auth, getProfile);
+router.post('/register', registerValidation, (req, res, next) => register(req, res, next));
+router.post('/login', loginValidation, (req, res, next) => login(req, res, next));
+router.get('/profile', auth, (req, res, next) => getProfile(req, res, next));
 
 module.exports = router;

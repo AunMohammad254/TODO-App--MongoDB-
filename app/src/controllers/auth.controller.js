@@ -4,12 +4,17 @@ const config = require('../../../config/app.config');
 const { validationResult } = require('express-validator');
 
 const generateToken = (userId) => {
+  if (!config.jwt || !config.jwt.secret) {
+    const err = new Error('JWT secret is not configured on the server');
+    err.status = 500;
+    throw err;
+  }
   return jwt.sign({ userId }, config.jwt.secret, {
     expiresIn: config.jwt.expiresIn
   });
 };
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -45,11 +50,11 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: 'Registration failed', details: error.message });
+    return next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -85,11 +90,11 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: 'Login failed', details: error.message });
+    return next(error);
   }
 };
 
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
   try {
     res.json({
       user: {
@@ -100,7 +105,7 @@ const getProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch profile' });
+    return next(error);
   }
 };
 

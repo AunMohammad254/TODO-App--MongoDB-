@@ -4,6 +4,13 @@ const config = require('../../../config/app.config');
 
 const auth = async (req, res, next) => {
   try {
+    // Ensure JWT secret is configured
+    if (!config.jwt || !config.jwt.secret) {
+      const err = new Error('JWT secret is not configured on the server');
+      err.status = 500;
+      throw err;
+    }
+
     const authHeader = req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Access Denied. No token provided' });
@@ -22,7 +29,7 @@ const auth = async (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token.' });
+    return next(error);
   }
 };
 
