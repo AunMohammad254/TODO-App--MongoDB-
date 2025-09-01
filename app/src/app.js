@@ -44,7 +44,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
       connectSrc: ["'self'"],
-      frameSrc: ["'self'", "https://vercel.live/"]
+      frameSrc: ["'self'", "https://vercel.live/"],
     }
   }
 }));
