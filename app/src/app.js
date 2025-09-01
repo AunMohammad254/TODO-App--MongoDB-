@@ -92,6 +92,13 @@ const dbGuard = (req, res, next) => {
 if (process.env.NODE_ENV !== 'test') {
   app.use('/api', dbGuard);
 }
+
+// Log incoming requests for debugging
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
