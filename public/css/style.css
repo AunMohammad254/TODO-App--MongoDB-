@@ -45,13 +45,67 @@ body {
 }
 
 .login-container input, .register-container input {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
     font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
 }
 
-.login-container button, .register-container button {
+.login-container input:focus, .register-container input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
+    outline: none;
+}
+
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    padding-right: 60px; /* Adjust based on button width */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.toggle-password i {
+    font-size: 1.2em;
+}
+
+.toggle-password:hover {
+    text-decoration: underline;
+}
+.login-btn{
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.toggle-password{
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.register-container button {
     padding: 12px;
     background: #667eea;
     color: white;

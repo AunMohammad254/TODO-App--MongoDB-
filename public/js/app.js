@@ -56,6 +56,23 @@ class TaskManager {
         });
 
         // Forms
+        // Password Toggle Functionality
+        const togglePasswordVisibility = (passwordFieldId, toggleButtonId) => {
+            const passwordField = document.getElementById(passwordFieldId);
+            const toggleButton = document.getElementById(toggleButtonId);
+
+            if (toggleButton) {
+                toggleButton.addEventListener('click', () => {
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+                    toggleButton.innerHTML = type === 'password' ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+                });
+            }
+        };
+
+        togglePasswordVisibility('password', 'togglePassword');
+        togglePasswordVisibility('regPassword', 'toggleRegPassword');
+
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleLogin();
@@ -224,6 +241,8 @@ class TaskManager {
                 const data = await response.json();
                 this.currentUser = data.user;
                 document.getElementById('welcomeUser').textContent = `Welcome, ${this.currentUser.username}!`;
+            } else if (response.status === 401) {
+                this.handleLogout();
             }
         } catch (error) {
             console.error('Failed to load profile:', error);
@@ -266,6 +285,8 @@ class TaskManager {
                 this.renderTasks();
                 this.renderPagination();
                 this.loadStats(); // Update stats when tasks change
+            } else if (response.status === 401) {
+                this.handleLogout();
             } else {
                 this.showNotification('Failed to load tasks', 'error');
             }
@@ -294,6 +315,8 @@ class TaskManager {
             if (response.ok) {
                 const data = await response.json();
                 this.renderStats(data);
+            } else if (response.status === 401) {
+                this.handleLogout();
             }
         } catch (error) {
             console.error('Failed to load stats:', error);
