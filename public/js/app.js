@@ -21,11 +21,12 @@ class TaskManager {
     
     getApiBaseUrl() {
         // Check if we're running in Electron with file:// protocol
-        if (window.location.protocol === 'file:') {
-            // In production Electron app, use localhost
+        // Check if we're running in Electron with file:// protocol or on localhost
+        if (window.location.protocol === 'file:' || window.location.hostname === 'localhost') {
+            // In production Electron app or local development, use localhost
             return 'http://localhost:3000';
         } else {
-            // In development or web browser, use relative URLs
+            // In deployed web browser, use relative URLs
             return '';
         }
     }

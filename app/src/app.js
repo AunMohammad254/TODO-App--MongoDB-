@@ -43,7 +43,8 @@ app.use(helmet({
       styleSrcElem: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'"]
+      connectSrc: ["'self'"],
+      frameSrc: ["'self'", "https://vercel.live/"]
     }
   }
 }));
