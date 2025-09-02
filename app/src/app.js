@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Security middleware
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // Trust only the first proxy (Vercel) for rate limiting security
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -49,7 +49,6 @@ app.use(helmet({
     }
   }
 }));
-app.set('trust proxy', true);
 app.use(cors());
 
 // Rate limiting
@@ -57,10 +56,10 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
-  // The 'trust proxy' setting is now true, so express-rate-limit will correctly
-  // use the X-Forwarded-For header to identify the client's IP address.
-  // This resolves the ERR_ERL_UNEXPECTED_X_FORWARDED_FOR error.
-  // For more details, refer to: https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/
+  // The 'trust proxy' setting is now set to 1 (trusting only the first proxy),
+  // which securely handles X-Forwarded-For headers from Vercel's proxy.
+  // This resolves both ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and ERR_ERL_PERMISSIVE_TRUST_PROXY errors.
+  // For more details, refer to: https://express-rate-limit.github.io/ERR_ERL_PERMISSIVE_TRUST_PROXY/
 });
 app.use(limiter);
 
