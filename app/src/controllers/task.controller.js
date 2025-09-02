@@ -90,9 +90,23 @@ const updateTask = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
+    // Only allow certain fields to be updated
+    const allowedFields = ['title', 'description', 'status', 'priority', 'dueDate']; // Update as per your model
+    const update = {};
+    for (const field of allowedFields) {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        update[field] = req.body[field];
+      }
+    }
+    // Prevent any attempted update operators injection
+    for (const key in req.body) {
+      if (key.startsWith('$')) {
+        return res.status(400).json({ error: 'Update operators are not allowed in the request body.' });
+      }
+    }
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
-      req.body,
+      update,
       { new: true, runValidators: true }
     );
 
