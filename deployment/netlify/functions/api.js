@@ -76,7 +76,7 @@ app.use(helmet({
       styleSrcElem: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "https://cluster0.xxothym.mongodb.net"]
+      connectSrc: ["'self'", process.env.MONGO_CLUSTER_URL || "https://your-cluster.mongodb.net"]
     }
   }
 }));

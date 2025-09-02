@@ -24,8 +24,8 @@ const taskValidation = [
   body('description')
     .optional()
     .trim()
-    .isLength({ max: 500 })
-    .withMessage('Description cannot exceed 500 characters'),
+    .isLength({ max: 200 })
+    .withMessage('Description cannot exceed 200 characters'),
   body('priority')
     .optional()
     .isIn(['low', 'medium', 'high'])
