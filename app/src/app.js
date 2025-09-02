@@ -34,6 +34,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Security middleware
+app.set('trust proxy', true);
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -43,7 +44,7 @@ app.use(helmet({
       styleSrcElem: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "ws://127.0.0.1:3001"],
       frameSrc: ["'self'", "https://vercel.live/"],
     }
   }
@@ -52,6 +53,11 @@ app.use(cors());
 
 // Rate limiting
 const limiter = rateLimit({
+  // Vercel and other proxies set X-Forwarded-For header
+  // trustProxy: true is set globally, so no need to set here
+  // See: https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/
+  // keyGenerator: (req) => req.ip, // Use the IP from req.ip which is now correctly set by 'trust proxy'
+
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.'
