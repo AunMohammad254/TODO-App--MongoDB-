@@ -51,16 +51,36 @@ app.use(helmet({
 }));
 app.use(cors());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  // The 'trust proxy' setting is now set to 1 (trusting only the first proxy),
-  // which securely handles X-Forwarded-For headers from Vercel's proxy.
-  // This resolves both ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and ERR_ERL_PERMISSIVE_TRUST_PROXY errors.
-  // For more details, refer to: https://express-rate-limit.github.io/ERR_ERL_PERMISSIVE_TRUST_PROXY/
-});
+// Rate limiting - Environment-specific configuration
+const getRateLimitConfig = () => {
+  const env = process.env.NODE_ENV || 'development';
+  
+  if (env === 'test') {
+    // Very lenient for testing
+    return {
+      windowMs: 1 * 60 * 1000, // 1 minute
+      max: 1000, // 1000 requests per minute
+      message: 'Too many requests from this IP, please try again later.',
+      skip: () => true // Skip rate limiting in test environment
+    };
+  } else if (env === 'development') {
+    // Lenient for development
+    return {
+      windowMs: 5 * 60 * 1000, // 5 minutes
+      max: 500, // 500 requests per 5 minutes
+      message: 'Too many requests from this IP, please try again later.'
+    };
+  } else {
+    // Strict for production
+    return {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // 100 requests per 15 minutes
+      message: 'Too many requests from this IP, please try again later.'
+    };
+  }
+};
+
+const limiter = rateLimit(getRateLimitConfig());
 app.use(limiter);
 
 // Body parsing middleware
@@ -107,6 +127,11 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+
+// Statistics endpoint for backward compatibility
+const auth = require('./middleware/auth');
+const { getTaskStats } = require('./controllers/task.controller');
+app.get('/api/statistics', auth, getTaskStats);
 
 // Serve frontend for all other routes
 // app.get('*', (req, res) => {

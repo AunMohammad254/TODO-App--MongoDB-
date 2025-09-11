@@ -8,16 +8,16 @@ const router = express.Router();
 // Validation rules
 const registerValidation = [
   body('username')
-    .isLength({ min: 3, max: 20 })
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Username must be 3-20 characters and contain only letters, numbers, and underscores'),
+    .isLength({ min: 3, max: 30 })
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage('Username must be 3-30 characters and contain only letters, numbers, underscores, dots, and hyphens'),
   body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Please provide a valid email'),
+    .isEmail({ allow_utf8_local_part: true })
+    .normalizeEmail({ gmail_remove_dots: false })
+    .withMessage('Please provide a valid email address'),
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
+    .isLength({ min: 6, max: 128 })
+    .withMessage('Password must be between 6 and 128 characters long')
 ];
 
 const loginValidation = [
