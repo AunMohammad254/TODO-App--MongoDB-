@@ -102,8 +102,8 @@ app.get('/api/health', (req, res) => {
 
 // Database connectivity guard for API routes
 const dbGuard = (req, res, next) => {
-  // Skip database check in test environment
-  if (process.env.NODE_ENV === 'test') {
+  // Skip database check in test environment and Vercel (handled in serverless wrapper)
+  if (process.env.NODE_ENV === 'test' || process.env.VERCEL) {
     return next();
   }
   
