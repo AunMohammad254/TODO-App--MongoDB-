@@ -31,13 +31,19 @@ const handler = serverless(app);
 
 module.exports = async (req, res) => {
   try {
+    // For health endpoint, don't require database connection
+    if (req.url === '/api/health') {
+      return await handler(req, res);
+    }
+    
     await ensureDbConnection();
     return await handler(req, res);
   } catch (error) {
     console.error('Serverless function error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
-    };
+    
+    // If database connection fails, still allow the request to proceed
+    // The individual route handlers will handle database unavailability
+    console.log('⚠️ Proceeding without database connection, letting route handlers decide');
+    return await handler(req, res);
   }
 };

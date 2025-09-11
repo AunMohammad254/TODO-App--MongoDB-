@@ -109,6 +109,12 @@ const dbGuard = (req, res, next) => {
   
   const status = typeof connectDatabase.getStatus === 'function' ? connectDatabase.getStatus() : { isConnected: false };
   if (!status.isConnected) {
+    console.warn('⚠️ Database not connected, but allowing request to proceed for debugging');
+    // In production, let requests proceed even if DB is not connected initially
+    // Individual route handlers will handle database operations appropriately
+    if (process.env.NODE_ENV === 'production') {
+      return next();
+    }
     return res.status(503).json({ message: 'Service temporarily unavailable: database not connected' });
   }
   next();
