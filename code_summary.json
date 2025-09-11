@@ -1,0 +1,124 @@
+{
+  "projectName": "TODO App (MongoDB)",
+  "description": "A full-stack TODO application with user authentication, task management, and MongoDB integration. Supports both local development and Vercel deployment with dual database configuration.",
+  "techStacks": {
+    "backend": {
+      "runtime": "Node.js",
+      "framework": "Express.js",
+      "database": "MongoDB with Mongoose ODM",
+      "authentication": "JWT (JSON Web Tokens)",
+      "validation": "express-validator",
+      "security": "bcryptjs for password hashing, helmet for security headers",
+      "middleware": "CORS, rate limiting, error handling",
+      "logging": "Custom logger utility",
+      "deployment": "Vercel serverless functions"
+    },
+    "frontend": {
+      "framework": "HTML/CSS/JavaScript (static files)",
+      "styling": "Custom CSS with responsive design",
+      "interaction": "Vanilla JavaScript with fetch API"
+    },
+    "devtools": {
+      "environment": "dotenv for configuration",
+      "testing": "TestSprite integration",
+      "deployment": "Vercel with custom configuration"
+    }
+  },
+  "features": [
+    {
+      "name": "User Authentication",
+      "description": "Complete user registration and login system with JWT tokens",
+      "files": [
+        "app/src/controllers/auth.controller.js",
+        "app/src/models/user.js",
+        "app/src/routes/auth.js",
+        "app/src/middleware/auth.js"
+      ],
+      "endpoints": [
+        "POST /api/auth/register",
+        "POST /api/auth/login"
+      ]
+    },
+    {
+      "name": "Task Management",
+      "description": "CRUD operations for tasks with filtering, sorting, and pagination",
+      "files": [
+        "app/src/controllers/task.controller.js",
+        "app/src/models/task.js",
+        "app/src/routes/tasks.js"
+      ],
+      "endpoints": [
+        "GET /api/tasks",
+        "GET /api/tasks/:id",
+        "POST /api/tasks",
+        "PUT /api/tasks/:id",
+        "DELETE /api/tasks/:id"
+      ]
+    },
+    {
+      "name": "Database Management",
+      "description": "Dual database configuration with automatic initialization and indexing",
+      "files": [
+        "app/src/utils/database.js",
+        "app/src/utils/initialize-database.js",
+        "config/app.config.js"
+      ]
+    },
+    {
+      "name": "Security & Validation",
+      "description": "Input validation, authentication middleware, and security headers",
+      "files": [
+        "app/src/middleware/validation.js",
+        "app/src/middleware/auth.js",
+        "app/src/middleware/error-handler.js"
+      ]
+    },
+    {
+      "name": "Frontend Interface",
+      "description": "Responsive web interface for task management",
+      "files": [
+        "app/public/index.html",
+        "app/public/login.html",
+        "app/public/register.html",
+        "app/public/css/styles.css",
+        "app/public/js/app.js",
+        "app/public/js/auth.js"
+      ]
+    },
+    {
+      "name": "Environment Configuration",
+      "description": "Dual environment support for development and production deployment",
+      "files": [
+        ".env",
+        ".env.example",
+        "config/app.config.js",
+        "vercel.json"
+      ]
+    }
+  ],
+  "architecture": {
+    "pattern": "MVC (Model-View-Controller)",
+    "structure": "Modular with separate concerns for routes, controllers, models, middleware, and utilities",
+    "deployment": "Serverless architecture on Vercel with MongoDB Atlas"
+  },
+  "keyComponents": {
+    "models": {
+      "User": "User authentication and profile management",
+      "Task": "Task data structure with validation and relationships"
+    },
+    "controllers": {
+      "AuthController": "Handles user registration and login",
+      "TaskController": "Manages CRUD operations for tasks"
+    },
+    "middleware": {
+      "Authentication": "JWT token validation",
+      "Validation": "Input validation using express-validator",
+      "ErrorHandler": "Centralized error handling"
+    },
+    "utilities": {
+      "Database": "MongoDB connection and configuration",
+      "Logger": "Application logging",
+      "DatabaseInitializer": "Automatic database setup and indexing"
+    }
+  }
+}

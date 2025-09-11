@@ -18,6 +18,7 @@ mongodb.log
 mongod.log
 # MongoDB Compass
 MONGODB_COMPASS_GUIDE.md
+testsprite_test_report.md
 
 # IDE/Editor
 .vscode/

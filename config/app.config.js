@@ -1,6 +1,13 @@
+const path = require('path');
+
+// Configure dotenv with proper path resolution for both local and serverless environments
 try {
+  const envPath = process.env.VERCEL 
+    ? path.resolve(process.cwd(), '.env')
+    : path.resolve(__dirname, '../../.env');
+  
   require("dotenv").config({
-    path: "../../.env",
+    path: envPath,
   });
 } catch (e) {
   // dotenv is optional in environments where env vars are injected
@@ -9,10 +16,26 @@ try {
   }
 }
 
+// Determine the appropriate MongoDB URI based on environment
+const getMongoURI = () => {
+  // In Vercel deployment, use production URI
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    return process.env.MONGO_URI_PROD || process.env.MONGO_URI || process.env.MONGODB_URI || process.env.ATLAS_URI;
+  }
+  
+  // In development, use development URI
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.MONGO_URI_DEV || process.env.MONGO_URI || process.env.MONGODB_URI || process.env.ATLAS_URI;
+  }
+  
+  // Default fallback
+  return process.env.MONGO_URI || process.env.MONGODB_URI || process.env.ATLAS_URI;
+};
+
 module.exports = {
   port: process.env.PORT || 3000,
   mongodb: {
-    uri: process.env.MONGO_URI || process.env.MONGODB_URI || process.env.ATLAS_URI,
+    uri: getMongoURI(),
     options: {
       // Removed deprecated options: useNewUrlParser and useUnifiedTopology (no longer needed in modern MongoDB driver)
       maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 10, // Maintain up to 10 socket connections

@@ -21,6 +21,7 @@ const taskValidation = [
     .trim()
     .isLength({ min: 1, max: 100 })
     .withMessage('Title is required and must be 1-100 characters'),
+    // .unique('Task with this title already exists'),
   body('description')
     .optional()
     .trim()
