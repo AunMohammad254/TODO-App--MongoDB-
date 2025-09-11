@@ -9,12 +9,18 @@ let dbInitialized = false;
 const ensureDbConnection = async () => {
   if (!dbInitialized) {
     try {
+      console.log('🔄 Initializing database connection in serverless function...');
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('Vercel:', process.env.VERCEL);
+      console.log('MongoDB URI available:', !!process.env.MONGO_URI_PROD || !!process.env.MONGO_URI || !!process.env.MONGODB_URI);
+      
       await connectDatabase();
       await initializeDatabase();
       dbInitialized = true;
       console.log('✅ Database initialized for serverless function');
     } catch (error) {
       console.error('❌ Database initialization failed:', error.message);
+      console.error('Full error:', error);
       throw error;
     }
   }
