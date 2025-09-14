@@ -60,6 +60,8 @@ Important.md
 secrets/
 credentials/
 config/secrets/
+config
+config\app.config.js
 private/
 auth/
 tokens/
