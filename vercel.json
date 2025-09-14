@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "runtime": "now-node@18.x",
+      "runtime": "nodejs18.x",
       "maxDuration": 30
     }
   },
